@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>planik — Слова по разделам</title>
+  <style>
+    :root{
+      --bg1:#f1f1f1;
+      --bg2:#d7d7d7;
+      --bg3:#ffffff;
+      --panel:rgba(255,255,255,0.66);
+      --panel-border:rgba(90,90,90,0.14);
+      --text:#2d2d2d;
+      --muted:#666;
+
+      --red1:#7a000c;
+      --red2:#c1121f;
+      --red3:#ff2a3d;
+      --red4:#ff6b7a;
+
+      --green1:#0f6b3d;
+      --green2:#1f9d55;
+      --green3:#38d996;
+      --green4:#8af0c6;
+
+      --silver1:#111111;
+      --silver2:#4c4c4c;
+      --silver3:#a8a8a8;
+      --silver4:#f2f2f2;
+      --silver5:#6d6d6d;
+
+      --gold1:#5f4100;
+      --gold2:#b8860b;
+      --gold3:#ffd76a;
+      --gold4:#fff0b3;
+      --gold5:#8d6800;
+
+      --shadow:0 10px 30px rgba(0,0,0,.08);
+      --radius:18px;
+      --transition:.22s ease;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      min-height:100vh;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,.95), transparent 28%),
+        radial-gradient(circle at 80% 30%, rgba(255,255,255,.6), transparent 24%),
+        linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3), var(--bg2));
+      background-size:100% 100%, 100% 100%, 300% 300%;
+      animation:bgFlow 16s ease infinite;
+      overflow-x:hidden;
+      position:relative;
+    }
+
+    body::before,
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      opacity:.24;
+      animation:shimmer 16s linear infinite alternate;
+    }
+
+    body::before{
+      background:
+        radial-gradient(circle at 25px 25px, rgba(80,80,80,.11) 2px, transparent 2.5px) 0 0/50px 50px,
+        radial-gradient(circle at 0 0, rgba(160,160,160,.12) 2px, transparent 2.5px) 25px 25px/50px 50px,
+        linear-gradient(45deg, rgba(40,40,40,.06) 25%, transparent 25%, transparent 75%, rgba(40,40,40,.06) 75%) 0 0/44px 44px;
+    }
+
+    body::after{
+      background:
+        conic-gradient(from 180deg at 15% 20%, rgba(70,70,70,.08), transparent 18%, rgba(170,170,170,.08), transparent 36%, rgba(70,70,70,.08)),
+        conic-gradient(from 90deg at 75% 60%, rgba(180,180,180,.08), transparent 20%, rgba(60,60,60,.08), transparent 40%, rgba(180,180,180,.08));
+      mix-blend-mode:multiply;
+    }
+
+    @keyframes shimmer{
+      0%{transform:translate3d(0,0,0) scale(1)}
+      100%{transform:translate3d(8px,-8px,0) scale(1.02)}
+    }
+
+    @keyframes bgFlow{
+      0%{background-position:0% 0%, 0% 0%, 0% 50%}
+      50%{background-position:0% 0%, 0% 0%, 100% 50%}
+      100%{background-position:0% 0%, 0% 0%, 0% 50%}
+    }
+
+    @keyframes gradientShift{
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
+    }
+
+    @keyframes fadeUp{
+      from{
+        opacity:0;
+        transform:translateY(10px) scale(.985);
+      }
+      to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+      }
+    }
+
+    .app{
+      position:relative;
+      z-index:1;
+      max-width:1380px;
+      margin:0 auto;
+      padding:28px 18px 90px;
+    }
+
+    .topbar{margin-bottom:22px}
+
+    .logo{
+      font-size:36px;
+      font-weight:800;
+      line-height:1;
+      letter-spacing:.5px;
+      text-transform:lowercase;
+      background:linear-gradient(120deg, #111, #a8a8a8, #f2f2f2, #4c4c4c, #6d6d6d, #111);
+      background-size:250% 250%;
+      animation:gradientShift 5s ease infinite;
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .subtitle{
+      font-size:14px;
+      color:#5c5c5c;
+      margin-top:6px;
+    }
+
+    .card{
+      background:linear-gradient(135deg, rgba(255,255,255,.72), rgba(255,255,255,.58), rgba(245,245,245,.72));
+      background-size:200% 200%;
+      animation:gradientShift 10s ease infinite;
+      border:1px solid var(--panel-border);
+      backdrop-filter:blur(10px);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+
+    .controls{
+      display:grid;
+      grid-template-columns:1.2fr .9fr auto;
+      gap:10px;
+      padding:16px;
+      margin-bottom:16px;
+    }
+
+    .section-create{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+      padding:16px;
+      margin-bottom:18px;
+    }
+
+    input, select{
+      width:100%;
+      border:none;
+      outline:none;
+      padding:14px 15px;
+      border-radius:14px;
+      background:linear-gradient(135deg, rgba(255,255,255,.92), rgba(247,247,247,.84), rgba(255,255,255,.96));
+      background-size:200% 200%;
+      animation:gradientShift 9s ease infinite;
+      color:#222;
+      font-size:15px;
+      box-shadow:inset 0 0 0 1px rgba(60,60,60,.08);
+    }
+
+    .btn{
+      border:none;
+      cursor:pointer;
+      padding:12px 16px;
+      border-radius:14px;
+      font-weight:700;
+      color:#fff;
+      background:linear-gradient(120deg, var(--red1), var(--red2), var(--red3), var(--red4), var(--red2), var(--red1));
+      background-size:250% 250%;
+      animation:gradientShift 4s ease infinite;
+      box-shadow:0 8px 20px rgba(193,18,31,.22);
+    }
+
+    .btn.small{
+      padding:8px 11px;
+      border-radius:11px;
+      font-size:12px;
+    }
+
+    .ghost-btn{
+      border:none;
+      cursor:pointer;
+      padding:8px 11px;
+      border-radius:11px;
+      font-size:12px;
+      font-weight:700;
+      color:#444;
+      background:linear-gradient(135deg, rgba(255,255,255,.92), rgba(242,242,242,.82), rgba(255,255,255,.95));
+      box-shadow:inset 0 0 0 1px rgba(60,60,60,.06);
+    }
+
+    .sections{
+      display:flex;
+      flex-direction:column;
+      gap:15px;
+    }
+
+    .section{
+      overflow:hidden;
+      animation:fadeUp .26s ease;
+    }
+
+    .section-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:16px 18px;
+      border-bottom:1px solid rgba(60,60,60,.08);
+    }
+
+    .section-left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+      flex:1;
+    }
+
+    .collapse-btn{
+      width:36px;
+      height:36px;
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      background:linear-gradient(135deg, rgba(255,255,255,.92), rgba(242,242,242,.82), rgba(255,255,255,.95));
+      color:#444;
+      flex:0 0 auto;
+    }
+
+    .section-title{
+      font-size:21px;
+      font-weight:800;
+      min-width:0;
+      word-break:break-word;
+      background:linear-gradient(120deg, #111, #a8a8a8, #f2f2f2, #4c4c4c, #6d6d6d, #111);
+      background-size:250% 250%;
+      animation:gradientShift 5s ease infinite;
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .section-title-row{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      min-width:0;
+      flex:1;
+    }
+
+    .inline-edit{
+      width:auto;
+      min-width:220px;
+      max-width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:18px;
+      font-weight:800;
+    }
+
+    .count{
+      font-size:13px;
+      color:var(--muted);
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.7);
+      box-shadow:inset 0 0 0 1px rgba(60,60,60,.06);
+      flex:0 0 auto;
+    }
+
+    .section-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .section-body{
+      padding:16px 18px 18px;
+      display:grid;
+      gap:14px;
+    }
+
+    .section-body.collapsed{display:none}
+
+    .word-form{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+    }
+
+    .dropzone{
+      min-height:10px;
+      border-radius:14px;
+      transition:var(--transition);
+    }
+
+    .dropzone.active{
+      min-height:42px;
+      background:linear-gradient(120deg, rgba(193,18,31,.08), rgba(255,80,100,.12), rgba(193,18,31,.08));
+      background-size:250% 250%;
+      animation:gradientShift 3s ease infinite;
+      box-shadow:inset 0 0 0 1px rgba(193,18,31,.16);
+    }
+
+    .word-list{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .word-item{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:12px;
+      align-items:center;
+      padding:14px 14px 14px 16px;
+      background:linear-gradient(135deg, rgba(255,255,255,.78), rgba(245,245,245,.72), rgba(255,255,255,.82));
+      border-radius:18px;
+      box-shadow:inset 0 0 0 1px rgba(60,60,60,.06);
+      cursor:grab;
+      animation:fadeUp .24s ease;
+    }
+
+    .word-item.dragging{
+      opacity:.45;
+      transform:scale(.99);
+      cursor:grabbing;
+    }
+
+    .word-main{
+      min-width:0;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      width:100%;
+    }
+
+    .drag-handle{
+      color:#999;
+      user-select:none;
+      font-size:18px;
+      line-height:1;
+      flex:0 0 auto;
+    }
+
+    .word-text{
+      min-width:0;
+      width:100%;
+      font-weight:800;
+      word-break:break-word;
+      line-height:1.35;
+      font-size:16px;
+      background:linear-gradient(120deg, #111, #4c4c4c, #f2f2f2, #a8a8a8, #6d6d6d, #111);
+      background-size:260% 260%;
+      animation:gradientShift 4.8s ease infinite;
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .word-side{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .status-btn{
+      min-width:58px;
+      border:none;
+      cursor:pointer;
+      padding:10px 12px;
+      border-radius:12px;
+      color:#fff;
+      font-weight:800;
+      background-size:250% 250%;
+      animation:gradientShift 4s ease infinite;
+    }
+
+    .status-btn.plus{
+      background:linear-gradient(120deg, var(--green1), var(--green2), var(--green3), var(--green4), var(--green2), var(--green1));
+    }
+
+    .status-btn.minus{
+      background:linear-gradient(120deg, var(--red1), var(--red2), var(--red3), var(--red4), var(--red2), var(--red1));
+    }
+
+    .gold-wrap{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      padding:8px 8px 8px 10px;
+      border-radius:12px;
+      background:rgba(255,255,255,.75);
+      box-shadow:inset 0 0 0 1px rgba(60,60,60,.06);
+    }
+
+    .gold-symbol{
+      background:linear-gradient(120deg, var(--gold1), var(--gold2), var(--gold4), var(--gold3), var(--gold5), var(--gold1));
+      background-size:250% 250%;
+      animation:gradientShift 4.5s ease infinite;
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      font-weight:800;
+      font-size:15px;
+    }
+
+    .number-input{
+      border:none;
+      outline:none;
+      background:transparent;
+      padding:0;
+      min-width:34px;
+      width:34px;
+      max-width:118px;
+      font-size:14px;
+      font-weight:800;
+      color:#b8860b;
+      box-shadow:none !important;
+    }
+
+    .empty{
+      text-align:center;
+      color:#666;
+      padding:18px 10px;
+      border-radius:14px;
+      background:rgba(255,255,255,.6);
+      box-shadow:inset 0 0 0 1px rgba(60,60,60,.05);
+      animation:fadeUp .22s ease;
+    }
+
+    .footer-note{
+      margin-top:18px;
+      text-align:center;
+      color:#666;
+      font-size:13px;
+    }
+
+    .signature{
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:12px;
+      z-index:3;
+      text-align:center;
+      pointer-events:none;
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:.6px;
+      background:linear-gradient(120deg, #7a000c, #c1121f, #ff2a3d, #ff6b7a, #ff2a3d, #c1121f, #7a000c);
+      background-size:260% 260%;
+      animation:gradientShift 3.5s ease infinite;
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      user-select:none;
+    }
+
+    @media (max-width: 980px){
+      .controls,
+      .section-create,
+      .word-form{
+        grid-template-columns:1fr;
+      }
+
+      .section-header{
+        flex-direction:column;
+        align-items:stretch;
+      }
+
+      .word-item{
+        grid-template-columns:1fr;
+      }
+
+      .word-side{
+        justify-content:flex-start;
+      }
+
+      .inline-edit{
+        min-width:0;
+        width:100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="logo">planik</div>
+      <div class="subtitle">Слова по разделам</div>
+    </div>
+
+    <div class="controls card">
+      <input id="globalWordInput" type="text" placeholder="Введите слово..." />
+      <select id="globalSectionSelect"></select>
+      <button class="btn" id="addGlobalWordBtn" type="button">Добавить слово</button>
+    </div>
+
+    <div class="section-create card">
+      <input id="newSectionInput" type="text" placeholder="Название нового раздела..." />
+      <button class="btn" id="addSectionBtn" type="button">Добавить раздел</button>
+    </div>
+
+    <div id="sections" class="sections"></div>
+    <div class="footer-note">Данные сохраняются автоматически</div>
+  </div>
+
+  <div class="signature">by starcade†</div>
+
+  <script>
+    const STORAGE_KEY = 'planik_words_sections_v4';
+    let state = loadState();
+    let draggedWord = null;
+    let autoScrollTimer = null;
+    let editingSectionId = null;
+
+    function uid() {
+      return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+    }
+
+    function defaultState() {
+      return {
+        sections: [
+          { id: uid(), name: 'Общее', collapsed: false, words: [] }
+        ]
+      };
+    }
+
+    function formatNumberString(value) {
+      const digits = String(value || '').replace(/\D/g, '').slice(0, 9);
+      if (!digits) return '';
+      return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+
+    function migrateWord(word) {
+      return {
+        id: word.id || uid(),
+        text: word.text || '',
+        status: word.status === '-' ? '-' : '+',
+        amount: formatNumberString(word.amount || '')
+      };
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return defaultState();
+        const parsed = JSON.parse(raw);
+        if (!parsed || !Array.isArray(parsed.sections) || !parsed.sections.length) {
+          return defaultState();
+        }
+        return {
+          sections: parsed.sections.map(section => ({
+            id: section.id || uid(),
+            name: section.name || 'Раздел',
+            collapsed: !!section.collapsed,
+            words: Array.isArray(section.words) ? section.words.map(migrateWord) : []
+          }))
+        };
+      } catch (e) {
+        return defaultState();
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function render() {
+      saveState();
+      renderSectionOptions();
+      renderSections();
+    }
+
+    function renderSectionOptions() {
+      const select = document.getElementById('globalSectionSelect');
+      const current = select.value;
+      select.innerHTML = '';
+
+      state.sections.forEach(section => {
+        const option = document.createElement('option');
+        option.value = section.id;
+        option.textContent = section.name;
+        select.appendChild(option);
+      });
+
+      if (state.sections.some(s => s.id === current)) {
+        select.value = current;
+      }
+    }
+
+    function renderSections() {
+      const root = document.getElementById('sections');
+      root.innerHTML = '';
+
+      state.sections.forEach(section => {
+        const wrap = document.createElement('div');
+        wrap.className = 'section card';
+
+        const header = document.createElement('div');
+        header.className = 'section-header';
+
+        const left = document.createElement('div');
+        left.className = 'section-left';
+
+        const collapseBtn = document.createElement('button');
+        collapseBtn.className = 'collapse-btn';
+        collapseBtn.type = 'button';
+        collapseBtn.textContent = section.collapsed ? '▸' : '▾';
+        collapseBtn.addEventListener('click', () => {
+          section.collapsed = !section.collapsed;
+          render();
+        });
+
+        const titleRow = document.createElement('div');
+        titleRow.className = 'section-title-row';
+
+        if (editingSectionId === section.id) {
+          const input = document.createElement('input');
+          input.className = 'inline-edit';
+          input.type = 'text';
+          input.value = section.name;
+
+          const saveBtn = document.createElement('button');
+          saveBtn.className = 'ghost-btn';
+          saveBtn.type = 'button';
+          saveBtn.textContent = 'OK';
+
+          const cancelBtn = document.createElement('button');
+          cancelBtn.className = 'ghost-btn';
+          cancelBtn.type = 'button';
+          cancelBtn.textContent = 'Отмена';
+
+          function saveInline() {
+            const clean = input.value.trim();
+            if (!clean) return;
+            section.name = clean;
+            editingSectionId = null;
+            render();
+          }
+
+          saveBtn.addEventListener('click', saveInline);
+          cancelBtn.addEventListener('click', () => {
+            editingSectionId = null;
+            render();
+          });
+
+          input.addEventListener('keydown', e => {
+            if (e.key === 'Enter') saveInline();
+            if (e.key === 'Escape') {
+              editingSectionId = null;
+              render();
+            }
+          });
+
+          setTimeout(() => {
+            input.focus();
+            input.select();
+          });
+
+          titleRow.append(input, saveBtn, cancelBtn);
+        } else {
+          const title = document.createElement('div');
+          title.className = 'section-title';
+          title.textContent = section.name;
+          titleRow.appendChild(title);
+        }
+
+        const count = document.createElement('div');
+        count.className = 'count';
+        count.textContent = 'Слов: ' + section.words.length;
+
+        left.append(collapseBtn, titleRow, count);
+
+        const actions = document.createElement('div');
+        actions.className = 'section-actions';
+
+        const editSectionBtn = document.createElement('button');
+        editSectionBtn.className = 'btn small';
+        editSectionBtn.type = 'button';
+        editSectionBtn.textContent = 'Править';
+        editSectionBtn.addEventListener('click', () => {
+          editingSectionId = section.id;
+          render();
+        });
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn small';
+        deleteBtn.type = 'button';
+        deleteBtn.textContent = 'Удалить';
+        deleteBtn.addEventListener('click', () => deleteSection(section.id));
+
+        actions.append(editSectionBtn, deleteBtn);
+        header.append(left, actions);
+
+        const body = document.createElement('div');
+        body.className = 'section-body' + (section.collapsed ? ' collapsed' : '');
+
+        const wordForm = document.createElement('div');
+        wordForm.className = 'word-form';
+
+        const wordInput = document.createElement('input');
+        wordInput.type = 'text';
+        wordInput.placeholder = 'Добавить слово в "' + section.name + '"';
+
+        const addWordBtn = document.createElement('button');
+        addWordBtn.className = 'btn small';
+        addWordBtn.type = 'button';
+        addWordBtn.textContent = 'Добавить';
+
+        function submitLocalWord() {
+          const value = wordInput.value.trim();
+          if (!value) return;
+          addWordToSection(section.id, value);
+          wordInput.value = '';
+        }
+
+        addWordBtn.addEventListener('click', submitLocalWord);
+        wordInput.addEventListener('keydown', e => {
+          if (e.key === 'Enter') submitLocalWord();
+        });
+
+        wordForm.append(wordInput, addWordBtn);
+        body.appendChild(wordForm);
+
+        const list = document.createElement('div');
+        list.className = 'word-list';
+
+        const topDropzone = createDropzone(section.id, 0);
+        list.appendChild(topDropzone);
+
+        if (!section.words.length) {
+          const empty = document.createElement('div');
+          empty.className = 'empty';
+          empty.textContent = 'Пока нет слов';
+          list.appendChild(empty);
+        } else {
+          section.words.forEach((word, index) => {
+            const item = document.createElement('div');
+            item.className = 'word-item';
+            item.draggable = true;
+
+            item.addEventListener('dragstart', () => {
+              draggedWord = {
+                wordId: word.id,
+                fromSectionId: section.id
+              };
+              item.classList.add('dragging');
+              document.body.style.userSelect = 'none';
+            });
+
+            item.addEventListener('dragend', () => {
+              item.classList.remove('dragging');
+              draggedWord = null;
+              document.body.style.userSelect = '';
+              stopAutoScroll();
+              document.querySelectorAll('.dropzone').forEach(z => z.classList.remove('active'));
+            });
+
+            const main = document.createElement('div');
+            main.className = 'word-main';
+
+            const handle = document.createElement('div');
+            handle.className = 'drag-handle';
+            handle.textContent = '⋮⋮';
+
+            const text = document.createElement('div');
+            text.className = 'word-text';
+            text.textContent = word.text;
+
+            main.append(handle, text);
+
+            const side = document.createElement('div');
+            side.className = 'word-side';
+
+            const goldWrap = document.createElement('div');
+            goldWrap.className = 'gold-wrap';
+
+            const goldSymbol = document.createElement('div');
+            goldSymbol.className = 'gold-symbol';
+            goldSymbol.textContent = '⊛';
+
+            const numInput = document.createElement('input');
+            numInput.className = 'number-input';
+            numInput.type = 'text';
+            numInput.inputMode = 'numeric';
+            numInput.placeholder = '0';
+            numInput.value = word.amount || '';
+            fitNumberInput(numInput);
+
+            numInput.addEventListener('input', () => {
+              word.amount = formatNumberString(numInput.value);
+              numInput.value = word.amount;
+              fitNumberInput(numInput);
+              saveState();
+            });
+
+            goldWrap.append(goldSymbol, numInput);
+
+            const statusBtn = document.createElement('button');
+            statusBtn.className = 'status-btn ' + (word.status === '+' ? 'plus' : 'minus');
+            statusBtn.type = 'button';
+            statusBtn.textContent = word.status;
+            statusBtn.addEventListener('click', () => {
+              word.status = word.status === '+' ? '-' : '+';
+              render();
+            });
+
+            const editWordBtn = document.createElement('button');
+            editWordBtn.className = 'btn small';
+            editWordBtn.type = 'button';
+            editWordBtn.textContent = 'Ред.';
+            editWordBtn.addEventListener('click', () => editWord(section.id, word.id));
+
+            const deleteWordBtn = document.createElement('button');
+            deleteWordBtn.className = 'btn small';
+            deleteWordBtn.type = 'button';
+            deleteWordBtn.textContent = 'Удалить';
+            deleteWordBtn.addEventListener('click', () => deleteWord(section.id, word.id));
+
+            side.append(goldWrap, statusBtn, editWordBtn, deleteWordBtn);
+            item.append(main, side);
+            list.appendChild(item);
+
+            const afterDropzone = createDropzone(section.id, index + 1);
+            list.appendChild(afterDropzone);
+          });
+        }
+
+        body.appendChild(list);
+        wrap.append(header, body);
+        root.appendChild(wrap);
+      });
+    }
+
+    function createDropzone(sectionId, index) {
+      const zone = document.createElement('div');
+      zone.className = 'dropzone';
+
+      zone.addEventListener('dragover', e => {
+        e.preventDefault();
+        zone.classList.add('active');
+      });
+
+      zone.addEventListener('dragleave', () => {
+        zone.classList.remove('active');
+      });
+
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('active');
+        if (!draggedWord) return;
+        moveWordToPosition(draggedWord.fromSectionId, draggedWord.wordId, sectionId, index);
+      });
+
+      return zone;
+    }
+
+    function fitNumberInput(el) {
+      const len = (el.value || el.placeholder || '').length;
+      const width = Math.min(118, Math.max(34, len * 9 + 8));
+      el.style.width = width + 'px';
+    }
+
+    function addSection(name) {
+      const clean = String(name || '').trim();
+      if (!clean) return;
+
+      state.sections.push({
+        id: uid(),
+        name: clean,
+        collapsed: false,
+        words: []
+      });
+
+      render();
+    }
+
+    function deleteSection(sectionId) {
+      const section = state.sections.find(s => s.id === sectionId);
+      if (!section) return;
+
+      if (state.sections.length === 1) {
+        alert('Нельзя удалить последний раздел.');
+        return;
+      }
+
+      if (!confirm('Удалить раздел "' + section.name + '" вместе со словами?')) return;
+
+      state.sections = state.sections.filter(s => s.id !== sectionId);
+      if (editingSectionId === sectionId) editingSectionId = null;
+      render();
+    }
+
+    function addWordToSection(sectionId, text) {
+      const section = state.sections.find(s => s.id === sectionId);
+      if (!section) return;
+
+      const clean = String(text || '').trim();
+      if (!clean) return;
+
+      section.words.unshift({
+        id: uid(),
+        text: clean,
+        status: '+',
+        amount: ''
+      });
+
+      render();
+    }
+    function editWord(sectionId, wordId) {
+      const section = state.sections.find(s => s.id === sectionId);
+      if (!section) return;
+
+      const word = section.words.find(w => w.id === wordId);
+      if (!word) return;
+
+      const next = prompt('Редактировать слово:', word.text);
+      if (next === null) return;
+
+      const clean = next.trim();
+      if (!clean) return;
+
+      word.text = clean;
+      render();
+    }
+
+    function deleteWord(sectionId, wordId) {
+      const section = state.sections.find(s => s.id === sectionId);
+      if (!section) return;
+
+      section.words = section.words.filter(w => w.id !== wordId);
+      render();
+    }
+
+    function moveWordToPosition(fromSectionId, wordId, toSectionId, toIndex) {
+      if (!fromSectionId || !wordId || !toSectionId) return;
+
+      const from = state.sections.find(s => s.id === fromSectionId);
+      const to = state.sections.find(s => s.id === toSectionId);
+      if (!from || !to) return;
+
+      const fromIndex = from.words.findIndex(w => w.id === wordId);
+      if (fromIndex === -1) return;
+
+      const [moved] = from.words.splice(fromIndex, 1);
+
+      let insertIndex = Math.max(0, Math.min(toIndex, to.words.length));
+
+      if (fromSectionId === toSectionId && fromIndex < toIndex) {
+        insertIndex -= 1;
+      }
+
+      to.words.splice(insertIndex, 0, moved);
+      render();
+    }
+
+    function handleAutoScroll(e) {
+      if (!draggedWord) return;
+
+      const topZone = 90;
+      const bottomZone = window.innerHeight - 90;
+
+      stopAutoScroll();
+
+      if (e.clientY < topZone) {
+        autoScrollTimer = setInterval(() => window.scrollBy(0, -18), 16);
+      } else if (e.clientY > bottomZone) {
+        autoScrollTimer = setInterval(() => window.scrollBy(0, 18), 16);
+      }
+    }
+
+    function stopAutoScroll() {
+      if (autoScrollTimer) {
+        clearInterval(autoScrollTimer);
+        autoScrollTimer = null;
+      }
+    }
+
+    document.addEventListener('dragover', handleAutoScroll);
+
+    const addSectionBtn = document.getElementById('addSectionBtn');
+    const newSectionInput = document.getElementById('newSectionInput');
+    const addGlobalWordBtn = document.getElementById('addGlobalWordBtn');
+    const globalWordInput = document.getElementById('globalWordInput');
+    const globalSectionSelect = document.getElementById('globalSectionSelect');
+
+    addSectionBtn.addEventListener('click', () => {
+      addSection(newSectionInput.value);
+      newSectionInput.value = '';
+    });
+
+    newSectionInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        addSection(newSectionInput.value);
+        newSectionInput.value = '';
+      }
+    });
+
+    addGlobalWordBtn.addEventListener('click', () => {
+      addWordToSection(globalSectionSelect.value, globalWordInput.value);
+      globalWordInput.value = '';
+    });
+
+    globalWordInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        addWordToSection(globalSectionSelect.value, globalWordInput.value);
+        globalWordInput.value = '';
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
